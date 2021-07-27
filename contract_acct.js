@@ -15,3 +15,4 @@ console.log(contract.methods);
 contract.methods.name().call().then(console.log);
 contract.methods.symbol().call().then(console.log);
 contract.methods.totalSupply().call().then(console.log);
+contract.methods.batFund().call().then(console.log);
