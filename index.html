@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Deploy a Remix Contract</title>
+
+
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+</head>
+
+<body>
+<div>
+    <h1>Deploy a Remix Contract</h1>
+</div>
+
+<script>
+
+    // Connect a the web3 provider
+    //if (typeof web3 !== 'undefined') {
+        //web3 = new Web3(web3.currentProvider); // <- for metamask injection
+    //} else {
+        web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545")); // <- ganache local server
+    //}
+
+    // Set a default account
+    web3.eth.defaultAccount = web3.eth.accounts[0];
+
+    // Get the contract address
+    var RemixContract = new web3.eth.Contract([
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "name": "x",
+                    "type": "string"
+                }
+            ],
+            "name": "setMessage",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "getMessage",
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ], '0xc26eCFacc71A5263D38A785ac682A6D0cDC7a9f6');
+
+    // Get the contract abi
+    console.log(RemixContract);
+
+    //https://web3js.readthedocs.io/en/v1.2.0/web3-eth-contract.html#id14
+    //Call: Will call the "constant" method and execute its smart contract method in the EVM
+    //      without sending a transaction (Can’t alter the smart contract state).
+    RemixContract.methods.getMessage().call({from: '0xd3B97DE8D51D129CB2C0c114511E7b1A53c65beF'}, (error,result) => {
+        if(!error) {
+            console.log(result);
+        } else {
+            console.log(error);
+        }
+    });
+
+    RemixContract.methods.setMessage('dizzy buzz').send({from: '0xd3B97DE8D51D129CB2C0c114511E7b1A53c65beF'}, (error,result) => {
+        if(!error) {
+            console.log(result);
+            RemixContract.methods.getMessage().call({from: '0xd3B97DE8D51D129CB2C0c114511E7b1A53c65beF'}, (error,result) => {
+                if(!error) {
+                    console.log(result);
+                } else {
+                    console.log(error);
+                }
+            });
+        } else {
+            console.log(error);
+        }
+    });
+
+    RemixContract.methods.setMessage("abcd.....").estimateGas()
+        .then(function(gasAmount){
+            console.log(gasAmount);
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+
+
+</script>
+</body>
+
+</html>
